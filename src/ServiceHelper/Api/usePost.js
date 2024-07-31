@@ -24,7 +24,6 @@ const usePost = (url, postData, trigger) => {
     }
   }, [url, postData, trigger]);
 
-
   return { response, loading, error };
 };
 

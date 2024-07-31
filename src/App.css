@@ -36,3 +36,12 @@
     transform: rotate(360deg);
   }
 }
+
+.backgroundImage {
+  width: 100%;
+  height: 100%;
+  background-image: url('/images/loginNewImg.jpg'); 
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
