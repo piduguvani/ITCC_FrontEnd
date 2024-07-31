@@ -19,7 +19,7 @@ const Login = () => {
     setLoading(true);
     setErrorMessage(null);
     try {
-      const response = await fetch('http://172.17.15.253:3002/users/login', {
+      const response = await fetch('http://172.17.15.253:3002/login', {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -76,15 +76,15 @@ const Login = () => {
         <Paper elevation={6} style={{ display: 'flex', minHeight: '370px', width: '670px' }}>
           <form onSubmit={handleSubmit(onSubmit)}>
             <Grid container>
-              <Grid container item xs={6} style={{ padding: '24px' }}>
-                <Typography variant="h4" align="left" style={{ fontWeight: '600' }}>
+              <Grid item xs={6} style={{ padding: '45px' }}>
+                <Typography variant="h5" align="left" style={{ fontWeight: '550' }}>
                   Login
                 </Typography>
-                <Typography variant="body2" align="left" style={{ marginBottom: '16px' }}>
+                <Typography  align="left" style={{ marginBottom: '5px', fontSize: '74%' }}>
                   Don't Have an Account? Create your Account
                 </Typography>
 
-                <Controller name="email" control={control} defaultValue=""
+                <Controller name="email"  control={control} defaultValue=""
                   rules={{
                     required: "Email Id is Required",
                     pattern: {
@@ -93,15 +93,17 @@ const Login = () => {
                     }
                   }}
                   render={({ field }) => (
-                    <TextField fullWidth variant="outlined" label="Email Id" type="email" margin="normal"
+                    <TextField fullWidth variant="outlined" label="Email Id" type="email" margin="normal" style={{marginLeft: '0px'}}
                       {...field}
                       error={!!errors.email}
                       helperText={errors.email?.message}
                     />
                   )}
                 />
-
                 <Controller name="password" control={control} defaultValue=""
+                  rules={{
+                    required: "Password is Required"
+                  }}
                   render={({ field }) => (
                     <TextField
                       fullWidth
@@ -115,22 +117,21 @@ const Login = () => {
                     />
                   )}
                 />
-
                 {errorMessage && (
-                  <Typography variant="body2" color="error" align="left" style={{ marginBottom: '16px' }}>
+                  <Typography  color="error" align="left" style={{ marginBottom: '16px' }}>
                     {errorMessage}
                   </Typography>
                 )}
 
-                <Grid container alignItems="center" style={{ marginTop: '16px', justifyContent: 'space-between' }}>
+                <Grid container alignItems="center" style={{ marginTop: '16px', justifyContent: 'space-between', marginBottom:'21px' }}>
                   <Grid item>
-                    <Link variant="body2" style={{ color: 'blue', cursor: 'pointer' }} onClick={handleClickOpen}>
+                    <Link  style={{ color: 'blue', cursor: 'pointer' }} onClick={handleClickOpen}>
                       Forgot Password?
                     </Link>
                   </Grid>
                   <Grid item>
                     <Button variant="contained" color="primary" type="submit" disabled={loading}>
-                      {loading ? 'Signing In...' : 'Sign In'}
+                      {/* {loading ? 'Signing In...' : 'Sign In'} */}  Sign In
                     </Button>
                   </Grid>
                 </Grid>
@@ -154,9 +155,7 @@ const Login = () => {
           </form>
         </Paper>
       </Container>
-
       <Registration signupOpen={signupOpen} handleSignupClose={handleSignupClose} />
-
       <Dialog
         open={open}
         onClose={handleClose}

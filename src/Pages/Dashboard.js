@@ -14,11 +14,17 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import GroupIcon from '@mui/icons-material/Group';
-import { Outlet, useNavigate } from 'react-router-dom';
-import { Avatar, ListItemText, Menu, MenuItem, Tooltip } from '@mui/material';
+import Avatar from '@mui/material/Avatar';
+import Tooltip from '@mui/material/Tooltip';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 import Logout from '@mui/icons-material/Logout';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import Badge from '@mui/material/Badge';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 
 const drawerWidth = 240;
 
@@ -69,12 +75,29 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 export default function Dashboard() {
   const theme = useTheme();
   const [open, setOpen] = React.useState(true);
-  const navigate = useNavigate();
-
   const [anchorEl, setAnchorEl] = React.useState(null);
   const openMenu = Boolean(anchorEl);
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const handleMenuClick = (event) => setAnchorEl(event.currentTarget);
   const handleMenuClose = () => setAnchorEl(null);
+
+  const logout = () => {
+    navigate('/');
+  };
+
+  const isActive = (path) => location.pathname === path;
+
+  const getActiveStyle = (path) => ({
+    color: isActive(path) ? theme.palette.primary.main : 'inherit',
+    '& .MuiListItemIcon-root': {
+      color: isActive(path) ? theme.palette.primary.main : 'inherit',
+    },
+    '& .MuiListItemText-primary': {
+      color: isActive(path) ? theme.palette.primary.main : 'inherit',
+    },
+  });
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -90,6 +113,14 @@ export default function Dashboard() {
           >
             <MenuIcon />
           </IconButton>
+
+          <Box sx={{ flexGrow: 1 }} />
+          <IconButton color="inherit">
+            <Badge badgeContent={0} color="error">
+              <NotificationsIcon />
+            </Badge>
+          </IconButton>
+
           <Tooltip title="Account Profile">
             <IconButton
               onClick={handleMenuClick}
@@ -126,9 +157,12 @@ export default function Dashboard() {
           </IconButton>
         </DrawerHeader>
         <Divider />
-        <List style={{paddingbottom:'0px'}}>
+        <List>
           <ListItem disablePadding>
-            <ListItemButton onClick={() => navigate('/admin-dashboard')}>
+            <ListItemButton
+              onClick={() => navigate('/admin-dashboard')}
+              sx={getActiveStyle('/admin-dashboard')}
+            >
               <ListItemIcon>
                 <DashboardIcon />
               </ListItemIcon>
@@ -136,7 +170,10 @@ export default function Dashboard() {
             </ListItemButton>
           </ListItem>
           <ListItem disablePadding>
-            <ListItemButton onClick={() => navigate('/users')}>
+            <ListItemButton
+              onClick={() => navigate('/users-list')}
+              sx={getActiveStyle('/users-list')}
+            >
               <ListItemIcon>
                 <GroupIcon />
               </ListItemIcon>
@@ -144,7 +181,10 @@ export default function Dashboard() {
             </ListItemButton>
           </ListItem>
           <ListItem disablePadding>
-            <ListItemButton onClick={() => navigate('/admin-community')}>
+            <ListItemButton
+              onClick={() => navigate('/admin-community')}
+              sx={getActiveStyle('/admin-community')}
+            >
               <ListItemIcon>
                 <GroupIcon />
               </ListItemIcon>
@@ -157,18 +197,17 @@ export default function Dashboard() {
         <DrawerHeader />
         <Outlet />
       </Main>
-      <Menu 
+      <Menu
         anchorEl={anchorEl}
         id="account-menu"
         open={openMenu}
         onClose={handleMenuClose}
-        onClick={handleMenuClose}
         PaperProps={{
           elevation: 0,
           sx: {
             overflow: 'visible',
             filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
-            mt:0.5,
+            mt: 0.5,
             '& .MuiAvatar-root': {
               width: 28,
               height: 28,
@@ -192,10 +231,10 @@ export default function Dashboard() {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        <MenuItem onClick={handleMenuClose}>
+        <MenuItem>
           <Avatar /> Profile
         </MenuItem>
-        <MenuItem onClick={handleMenuClose}>
+        <MenuItem onClick={logout}>
           <ListItemIcon>
             <Logout fontSize="small" />
           </ListItemIcon>

@@ -137,18 +137,14 @@ export default function MixedCharts() {
               <ApexCharts options={areaChartOptions} series={areaChartSeries} type="area" width={300} />
               <Typography variant="h6" align="center" style={{ marginTop: '10px' }}>Community Status</Typography>
             </Grid>
-            <Grid item xs={12} md={6}>
-              <Grid container spacing={2}>
-                <Grid item xs={12} md={6}>
+                <Grid item xs={12} md={4}>
                   <ApexCharts options={barChartOptions} series={[barChartSeries[0]]} type="bar" width={300} />
                   <Typography variant="h6" align="center" style={{ marginTop: '10px' }}>Community Users</Typography>
                 </Grid>
-                <Grid item xs={12} md={6}>
+                <Grid item xs={12} md={4}>
                   <ApexCharts options={barChartOptions} series={[barChartSeries[1]]} type="bar" width={300} />
                   <Typography variant="h6" align="center" style={{ marginTop: '10px' }}>Community Posts</Typography>
                 </Grid>
-              </Grid>
-            </Grid>
           </Grid>
         </AccordionDetails>
       </Accordion>
