@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Grid, Paper, TextField, Button, Typography, Link, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
+import Registration from './Registration';
 
 const Login = () => {
   const { control, handleSubmit, formState: { errors } } = useForm({
@@ -11,6 +12,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [signupOpen, setSignupOpen] = useState(false);
   const navigate = useNavigate();
 
   const onSubmit = async (data) => {
@@ -28,11 +30,9 @@ const Login = () => {
           password: data.password,
         }),
       });
-      console.log(data);
       if (!response.ok) {
         throw new Error('API request failed');
       }
-      console.log(data);
       const responseData = await response.json();
       console.log('API response:', responseData);
       setIsLoggedIn(true);
@@ -58,8 +58,12 @@ const Login = () => {
     setOpen(false);
   };
 
-  const navigateReg = () => {
-    navigate('/registration/');
+  const handleSignupOpen = () => {
+    setSignupOpen(true);
+  };
+
+  const handleSignupClose = () => {
+    setSignupOpen(false);
   };
 
   return (
@@ -98,7 +102,6 @@ const Login = () => {
                 />
 
                 <Controller name="password" control={control} defaultValue=""
-
                   render={({ field }) => (
                     <TextField
                       fullWidth
@@ -143,7 +146,7 @@ const Login = () => {
                 <Typography align="right" style={{ marginBottom: '30px', fontSize: '0.75rem', whiteSpace: 'normal', maxWidth: '80%' }}>
                   Simply create your account by clicking the Signup button
                 </Typography>
-                <Button variant="outlined" style={{ color: 'white', borderColor: 'white' }} onClick={navigateReg}>
+                <Button variant="outlined" style={{ color: 'white', borderColor: 'white' }} onClick={handleSignupOpen}>
                   Sign Up
                 </Button>
               </Grid>
@@ -152,36 +155,36 @@ const Login = () => {
         </Paper>
       </Container>
 
-      {/* <div> */}
-        <Dialog
-          open={open}
-          onClose={handleClose}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <DialogTitle id="alert-dialog-title">
-            {"Forgot Password"}
-          </DialogTitle>
-          <DialogContent>
-            <DialogContentText id="alert-dialog-description">
-              <TextField
-                fullWidth
-                variant="outlined"
-                label="Email Id"
-                type="email"
-                margin="normal"
-              />
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClose}>Cancel</Button>
-            <Button onClick={handleClose} autoFocus>
-              Reset Password
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </div>
-    // </div>
+      <Registration signupOpen={signupOpen} handleSignupClose={handleSignupClose} />
+
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Forgot Password"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            <TextField
+              fullWidth
+              variant="outlined"
+              label="Email Id"
+              type="email"
+              margin="normal"
+            />
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Cancel</Button>
+          <Button onClick={handleClose} autoFocus>
+            Reset Password
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </div>
   );
 };
 

@@ -1,17 +1,37 @@
-import React from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import {Grid, TextField, Button, Card, Typography, FormControl,FormHelperText, InputLabel, MenuItem, Select, Box} from '@mui/material';
-import { DevTool } from '@hookform/devtools';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { Grid,TextField,Button,Dialog,DialogTitle, DialogContent,Typography, FormControl,FormHelperText,InputLabel,
+  MenuItem,Select, Box} from "@mui/material";
+import { DevTool } from "@hookform/devtools";
+import usePost from "../../ServiceHelper/Api/usePost";
+import useGet from "../../ServiceHelper/Api/useGet";
 
-function Registration() {
+function Registration(props) {
   const form = useForm({
-    mode: "onTouched"
+    mode: "onTouched",
   });
   const { register, handleSubmit, control, formState } = form;
   const { errors } = formState;
+  const [postUrl, setPostUrl] = useState("");
+  const [getUrl, setGetUrl] = useState("");
+  const [community, setCommunity] = useState([]);
+  const [postData, setPostData] = useState("");
+  const [triggerPost, setTriggerPost] = useState(false);
+  const { data: data1, loading: loading1, error: error1 } = usePost(postUrl, postData, triggerPost);
+  const getHook = useGet(getUrl);
 
-  //allow numbers only and take 10 digit numbers
+  const [selectedCommunity, setSelectedCommunity] = useState("");
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (getUrl === "") {
+      setGetUrl("/users/getCommunity");
+    }
+    if (getHook.data !== null) {
+      setCommunity(getHook.data);
+    }
+  }, [getHook.data]);
+
   const applyOnlyNumbers = (event) => {
     const input = event.target.value;
     const charCode = event.which ? event.which : event.keyCode;
@@ -23,30 +43,38 @@ function Registration() {
     const phoneNumber = data.phoneNumber;
     const phoneRegex = /^[0-9]{10}$/;
     if (!phoneRegex.test(phoneNumber)) {
-      alert('Please provide a valid phone number');
+      alert("Please provide a valid phone number");
       return;
     }
     try {
-      const response = await axios.post('http://172.17.15.253:3002/api/registration', {
-        firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.email,
-        points: data.points,
-        community: data.community,
-        Password: data.password
-      });
-      console.log('Registration successful:', response.data);
+      if (!triggerPost) {
+        setTriggerPost(true);
+        setPostData({
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          phoneNumber: data.phoneNumber,
+          community: selectedCommunity,
+        });
+        setPostUrl("/users/create");
+      }
     } catch (error) {
-      console.error('Error during registration:', error);
+      console.error("Error during registration:", error);
     }
   };
+  const handleClose = () => {
+    props.handleSignupClose();
+  };
+
   return (
-    <Grid container alignItems='center' style={{ minHeight: '100vh', padding: '20px', backgroundSize: 'cover' ,justifyContent:"center"}}>
-      <Grid item xs={12} sm={8} md={6} lg={4}>
-        <Card variant="outlined" sx={{ padding: '20px', backgroundColor: 'rgba(255, 255, 255, 0.8)', boxShadow: 3 }}>
+    <>
+      <Dialog open={props.signupOpen} onClose={handleClose} maxWidth="md" fullWidth>
+        <DialogTitle>
           <Typography variant="h5" component="div" align="center" gutterBottom>
             <b>REGISTER</b>
           </Typography>
+        </DialogTitle>
+        <DialogContent>
           <form onSubmit={handleSubmit(onSubmit)}>
             <Grid container spacing={2}>
               <Grid item xs={6}>
@@ -61,12 +89,12 @@ function Registration() {
                     required: "First Name is Required",
                     pattern: {
                       value: /^[A-Za-z]+$/,
-                      message: "First Name must contain only alphabets"
+                      message: "First Name must contain only alphabets",
                     },
                     maxLength: {
                       value: 40,
-                      message: "First Name cannot exceed 40 characters"
-                    }
+                      message: "First Name cannot exceed 40 characters",
+                    },
                   })}
                   error={!!errors.firstName}
                   helperText={errors.firstName?.message}
@@ -84,12 +112,12 @@ function Registration() {
                     required: "Last Name is Required",
                     pattern: {
                       value: /^[A-Za-z]+$/,
-                      message: "Last Name must contain only alphabets"
+                      message: "Last Name must contain only alphabets",
                     },
                     maxLength: {
                       value: 40,
-                      message: "Last Name cannot exceed 40 characters"
-                    }
+                      message: "Last Name cannot exceed 40 characters",
+                    },
                   })}
                   error={!!errors.lastName}
                   helperText={errors.lastName?.message}
@@ -108,21 +136,26 @@ function Registration() {
                         id="community"
                         label="Community"
                         value={field.value || ""}
-                        onChange={(e) => field.onChange(e.target.value)}
+                        onChange={(e) => {
+                          field.onChange(e.target.value);
+                          setSelectedCommunity(e.target.value);
+                        }}
                       >
-                        <MenuItem value=""><em>None</em></MenuItem>
-                        <MenuItem value="ReactJs">ReactJs</MenuItem>
-                        <MenuItem value="Angular">Angular</MenuItem>
-                        <MenuItem value="NodeJs">NodeJs</MenuItem>
+                        {community.map((com) => (
+                          <MenuItem key={com.id} value={com.id}>
+                            {com.label}
+                          </MenuItem>
+                        ))}
                       </Select>
                       <FormHelperText>{errors.community?.message}</FormHelperText>
                     </FormControl>
                   )}
                 />
               </Grid>
-              <Grid item xs={12} sm={6} style={{ marginTop: 'inherit' }}>
+              <Grid item xs={12} sm={6} style={{ marginTop: "inherit" }}>
                 <TextField
                   fullWidth
+                  name="phoneNumber"
                   variant="outlined"
                   label="Phone Number"
                   type="tel"
@@ -132,12 +165,12 @@ function Registration() {
                     required: "Phone Number is Required",
                     pattern: {
                       value: /^[0-9]*$/,
-                      message: "Phone Number must contain only numbers"
+                      message: "Phone Number must contain only numbers",
                     },
                     maxLength: {
                       value: 10,
-                      message: "Phone Number cannot exceed 10 digits"
-                    }
+                      message: "Phone Number cannot exceed 10 digits",
+                    },
                   })}
                   error={!!errors.phoneNumber}
                   helperText={errors.phoneNumber?.message}
@@ -145,13 +178,19 @@ function Registration() {
                 />
               </Grid>
               <Grid item xs={12}>
-                <TextField fullWidth variant="outlined" label="Email Id" type="email" id="email" margin="normal"
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  label="Email Id"
+                  type="email"
+                  id="email"
+                  margin="normal"
                   {...register("email", {
                     required: "Email Id is Required",
                     pattern: {
                       value: /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/,
-                      message: "Invalid email format"
-                    }
+                      message: "Invalid email format",
+                    },
                   })}
                   error={!!errors.email}
                   helperText={errors.email?.message}
@@ -163,7 +202,8 @@ function Registration() {
                     type="submit"
                     variant="contained"
                     color="primary"
-                    style={{ marginTop: '16px', width: '50%' }}>
+                    style={{ marginTop: "16px", width: "15%" }}
+                  >
                     Sign Up
                   </Button>
                 </Box>
@@ -171,9 +211,14 @@ function Registration() {
             </Grid>
           </form>
           <DevTool control={control} />
-        </Card>
-      </Grid>
-    </Grid>
+        </DialogContent>
+      </Dialog>
+      <DevTool control={control} />
+    </>
   );
 }
+
 export default Registration;
+
+
+
