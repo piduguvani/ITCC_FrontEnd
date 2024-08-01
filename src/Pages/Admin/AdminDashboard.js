@@ -44,7 +44,7 @@ export default function MixedCharts() {
       }
     },
     xaxis: {
-      categories: ['Angular', 'React.js', 'Node.js', 'Javascript']
+      categories: ['07-28-2024','07-29-2024','07-30-2024','07-31-2024','08-01-2024','08-02-2024','08-03-2024']
     },
     colors: ['#FF4560'],
   };
@@ -101,7 +101,7 @@ export default function MixedCharts() {
           <Typography variant="h6">Users</Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <ApexCharts options={pieChartOptions} series={pieChartSeries} type="pie" width={380} />
+          <ApexCharts options={pieChartOptions} series={pieChartSeries} type="pie" width={380} align="center"/>
           <Typography variant="h6" align="center" style={{ marginTop: '10px' }}>Top 5 Community Users</Typography>
         </AccordionDetails>
       </Accordion>
@@ -133,17 +133,19 @@ export default function MixedCharts() {
           </Grid>
           <br />
           <Grid container spacing={2}>
-            <Grid item xs={12} md={4}>
-              <ApexCharts options={areaChartOptions} series={areaChartSeries} type="area" width={300} />
-              <Typography variant="h6" align="center" style={{ marginTop: '10px' }}>Community Status</Typography>
+            <Grid item xs={12} md={6}>
+              <ApexCharts options={areaChartOptions} series={areaChartSeries} type="area" width={400}  />
+              <Typography variant="h6"  style={{ marginTop: '10px' }}>Community Status</Typography>
             </Grid>
-                <Grid item xs={12} md={4}>
-                  <ApexCharts options={barChartOptions} series={[barChartSeries[0]]} type="bar" width={300} />
-                  <Typography variant="h6" align="center" style={{ marginTop: '10px' }}>Community Users</Typography>
+            </Grid>
+            <Grid container spacing={2}>
+                <Grid item xs={12} md={6}>
+                  <ApexCharts options={barChartOptions} series={[barChartSeries[0]]} type="bar" width={400} />
+                  <Typography variant="h6"  style={{ marginTop: '10px' }}>Community Users</Typography>
                 </Grid>
-                <Grid item xs={12} md={4}>
-                  <ApexCharts options={barChartOptions} series={[barChartSeries[1]]} type="bar" width={300} />
-                  <Typography variant="h6" align="center" style={{ marginTop: '10px' }}>Community Posts</Typography>
+                <Grid item xs={12} md={6}>
+                  <ApexCharts options={barChartOptions} series={[barChartSeries[1]]} type="bar" width={400} />
+                  <Typography variant="h6" style={{ marginTop: '10px' }}>Community Posts</Typography>
                 </Grid>
           </Grid>
         </AccordionDetails>

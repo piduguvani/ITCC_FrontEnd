@@ -18,11 +18,15 @@ export default function UserDetails() {
   const questions = [
     { votes: 135, title: "Windows XP or later Windows: How can I run a batch file in the background with no window displayed?", date: "Nov 18, 2008" },
     { votes: 77, title: "Conditional logging with minimal cyclomatic complexity", date: "Sep 19, 2008" },
+    { votes: 13, title: "Windows XP or later Windows: How can I run a batch file in the background with no window displayed?", date: "Nov 18, 2008" },
+    { votes: 7, title: "Conditional logging with minimal cyclomatic complexity", date: "Sep 19, 2008" },
   ];
 
   const answers = [
     { votes: 45, title: "Use the start command in a batch file to run a script in the background.", date: "Nov 20, 2008" },
     { votes: 30, title: "Conditional logging can be implemented using a logging framework with support for filters.", date: "Sep 21, 2008" },
+    { votes: 4, title: "Use the start command in a batch file to run a script in the background.", date: "Nov 20, 2008" },
+    { votes: 3, title: "Conditional logging can be implemented using a logging framework with support for filters.", date: "Sep 21, 2008" },
   ];
 
   const articles = [
@@ -37,7 +41,6 @@ export default function UserDetails() {
         <CardContent>
           <Typography variant="h5">Karthik Nistala</Typography>
           <Typography variant="body2" color="textSecondary">Member for 15 years, 10 months</Typography>
-          <Typography variant="body2" color="textSecondary">Last seen this week</Typography>
         </CardContent>
       </Card>
       <Tabs value={tabValue} onChange={handleTabChange} aria-label="user profile tabs">

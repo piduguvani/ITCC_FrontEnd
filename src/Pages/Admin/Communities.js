@@ -5,23 +5,26 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
-import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import Rating from '@mui/material/Rating';
+import { useNavigate } from 'react-router-dom';
+import { Fab, IconButton, InputBase, Paper } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import AddIcon from '@mui/icons-material/Add';
 
-const gradientStyle = {
-  background: '#a1c4fd',
-  background: '-webkit-linear-gradient(to right, rgba(161,196,253,0.5), rgba(194,233,251,0.5))', // Chrome 10-25, Safari 5.1-6
-  background: 'linear-gradient(to right, rgba(161,196,253,0.5), rgba(194,233,251,0.5))', // W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+
-borderRadius:5
-};
 
-const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-  ...theme.typography.body2,
-  padding: theme.spacing(1),
-  textAlign: 'center',
-  color: theme.palette.text.secondary,
+const UserCard = styled(Card)(({ theme }) => ({
+  borderRadius: 5,
+  cursor: 'pointer',
+  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+  transition: 'transform 0.3s',
+  '&:hover': {
+    transform: 'scale(1.03)',
+  },
+  backgroundColor: theme.palette.background.paper,
+  display: 'flex',
+  flexDirection: 'column',
+  height: '100%',
 }));
 
 const cardData = [
@@ -48,30 +51,45 @@ const cardData = [
   },
   {
     communityName: "Node JS",
-    description: '',
+    description: 'Node. js is ideal for building fast and scalable web servers that handle numerous simultaneous connections.',
     Questions: "/static/Questionss/cards/contemplative-reptile.jpg",
     User: 80,
-    Tech: "Another description about lizards.",
-  },
-  {
-    communityName: "Mongo DB",
-    description: '',
-    Questions: "/static/Questionss/cards/contemplative-reptile.jpg",
-    User: 79,
     Tech: "Another description about lizards.",
   },
 ];
 
 export default function Communities() {
   const [value, setValue] = React.useState(2);
+  const navigate = useNavigate();
+
+  const handleCardClick = () => {
+    navigate('/community-details');
+  };
 
   return (
-    <Box sx={{ width: '100%' }}>
-      <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+    <>
+      <br />
+      <Grid container spacing={2} direction="row" justifyContent="flex-end" alignItems="center">
+        <Paper
+          component="form"
+          sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: 400 }}
+        >
+          <InputBase
+            sx={{ ml: 1, flex: 1 }}
+            placeholder="Search for Community Name"
+            inputProps={{ 'aria-label': 'search google maps' }}
+          />
+          <IconButton type="button" sx={{ p: '10px' }} aria-label="search">
+            <SearchIcon />
+          </IconButton>
+        </Paper>
+      </Grid>
+      <br />
+      <Grid container spacing={2}>
         {cardData.map((card, index) => (
-          <Grid item xs={12} sm={6} md={4} key={index}>
-            <Card style={gradientStyle}>
-              <CardContent>
+          <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+            <UserCard onClick={handleCardClick}>
+              <CardContent sx={{ flex: 1 }}>
                 <Typography gutterBottom variant="h5" component="div">
                   {card.communityName}
                 </Typography>
@@ -86,24 +104,30 @@ export default function Communities() {
                   <b>User:</b> {card.User}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  <b>Questions:</b> {card.User}
+                  <b>Questions:</b> {card.Questions}
                 </Typography>
               </CardContent>
-              <CardActions>
-              <Box sx={{ '& > legend': { mt: 2 } }}>
-                
-                <Rating
-                  name="simple-controlled"
-                  value={value}
-                  onChange={(event, newValue) => setValue(newValue)}
-                />
-              </Box>
+              <CardActions sx={{ justifyContent: 'flex-end' }}>
+                <Box sx={{ '& > legend': { mt: 2 } }}>
+                  <Rating
+                    name="simple-controlled"
+                    value={value}
+                    onChange={(event, newValue) => setValue(newValue)}
+                  />
+                </Box>
               </CardActions>
-          
-            </Card>
+            </UserCard>
           </Grid>
+          
         ))}
       </Grid>
-    </Box>
+      <Fab
+        color="primary"
+        aria-label="add"
+        sx={{ position: 'fixed', bottom: 16, right: 16 }}
+      >
+        <AddIcon />
+      </Fab>
+    </>
   );
 }

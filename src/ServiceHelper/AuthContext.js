@@ -1,70 +1,58 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Grid, Paper, TextField, Button, Typography, Link, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
+import {
+  Container,
+  Grid,
+  Paper,
+  TextField,
+  Button,
+  Typography,
+  Link,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions
+} from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import Registration from './Registration';
+import { useAuth } from "../../ServiceHelper/AuthContext";
+// import usePost from '../Services/usePost';
 
 const Login = () => {
-  const { control, handleSubmit, formState: { errors } } = useForm({
-    mode: 'onTouched'
-  });
+  const { control, handleSubmit, formState: { errors } } = useForm({ mode: 'onTouched' });
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [signupOpen, setSignupOpen] = useState(false);
+  const [triggerPost, setTriggerPost] = useState(false);
+//   const { saveToken } = useAuth();
   const navigate = useNavigate();
 
+  const [postData, setPostData] = useState(null);
+  const { response, loading, error } = usePost('/login', postData, triggerPost);
+
   const onSubmit = async (data) => {
-    setLoading(true);
-    setErrorMessage(null);
-    try {
-      const response = await fetch('http://172.17.15.253:3002/login', {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: data.email,
-          password: data.password,
-        }),
-      });
-      if (!response.ok) {
-        throw new Error('API request failed');
-      }
-      const responseData = await response.json();
-      console.log('API response:', responseData);
-      setIsLoggedIn(true);
-    } catch (error) {
-      console.error('API error:', error);
-      setErrorMessage('Login failed. Please check your email and password.');
-    } finally {
-      setLoading(false);
-    }
+    setTriggerPost(false); // Reset trigger
+    setPostData({ email: data.email, password: data.password });
+    setTriggerPost(true); // Trigger post request
   };
 
   useEffect(() => {
-    if (isLoggedIn) {
-      navigate('/admin-dashboard');
+    if (response) {
+      saveToken(response.token);
+      navigate('/dashboard');
     }
-  }, [isLoggedIn, navigate]);
+  }, [response, navigate, saveToken]);
 
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
+  useEffect(() => {
+    if (error) {
+      console.error('API error:', error);
+    }
+  }, [error]);
 
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  const handleSignupOpen = () => {
-    setSignupOpen(true);
-  };
-
-  const handleSignupClose = () => {
-    setSignupOpen(false);
-  };
+  const handleClickOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+  const handleSignupOpen = () => setSignupOpen(true);
+  const handleSignupClose = () => setSignupOpen(false);
 
   return (
     <div style={{
@@ -80,20 +68,17 @@ const Login = () => {
                 <Typography variant="h5" align="left" style={{ fontWeight: '550' }}>
                   Login
                 </Typography>
-                <Typography  align="left" style={{ marginBottom: '5px', fontSize: '74%' }}>
+                <Typography align="left" style={{ marginBottom: '5px', fontSize: '74%' }}>
                   Don't Have an Account? Create your Account
                 </Typography>
 
-                <Controller name="email"  control={control} defaultValue=""
+                <Controller name="email" control={control} defaultValue=""
                   rules={{
                     required: "Email Id is Required",
-                    pattern: {
-                      value: /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/,
-                      message: "Invalid email format"
-                    }
+                    pattern: { value: /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/, message: "Invalid email format" }
                   }}
                   render={({ field }) => (
-                    <TextField fullWidth variant="outlined" label="Email Id" type="email" margin="normal" style={{marginLeft: '0px'}}
+                    <TextField fullWidth variant="outlined" label="Email Id" type="email" margin="normal" style={{ marginLeft: '0px' }}
                       {...field}
                       error={!!errors.email}
                       helperText={errors.email?.message}
@@ -101,9 +86,7 @@ const Login = () => {
                   )}
                 />
                 <Controller name="password" control={control} defaultValue=""
-                  rules={{
-                    required: "Password is Required"
-                  }}
+                  rules={{ required: "Password is Required" }}
                   render={({ field }) => (
                     <TextField
                       fullWidth
@@ -117,21 +100,21 @@ const Login = () => {
                     />
                   )}
                 />
-                {errorMessage && (
-                  <Typography  color="error" align="left" style={{ marginBottom: '16px' }}>
-                    {errorMessage}
+                {error && (
+                  <Typography color="error" align="left" style={{ marginBottom: '16px' }}>
+                    Login failed. Please check your email and password.
                   </Typography>
                 )}
 
-                <Grid container alignItems="center" style={{ marginTop: '16px', justifyContent: 'space-between', marginBottom:'21px' }}>
+                <Grid container alignItems="center" style={{ marginTop: '16px', justifyContent: 'space-between', marginBottom: '21px' }}>
                   <Grid item>
-                    <Link  style={{ color: 'blue', cursor: 'pointer' }} onClick={handleClickOpen}>
+                    <Link style={{ color: 'blue', cursor: 'pointer' }} onClick={handleClickOpen}>
                       Forgot Password?
                     </Link>
                   </Grid>
                   <Grid item>
                     <Button variant="contained" color="primary" type="submit" disabled={loading}>
-                      {/* {loading ? 'Signing In...' : 'Sign In'} */}  Sign In
+                      {loading ? 'Signing In...' : 'Sign In'}
                     </Button>
                   </Grid>
                 </Grid>
@@ -156,24 +139,11 @@ const Login = () => {
         </Paper>
       </Container>
       <Registration signupOpen={signupOpen} handleSignupClose={handleSignupClose} />
-      <Dialog
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">
-          {"Forgot Password"}
-        </DialogTitle>
+      <Dialog open={open} onClose={handleClose} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+        <DialogTitle id="alert-dialog-title">{"Forgot Password"}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            <TextField
-              fullWidth
-              variant="outlined"
-              label="Email Id"
-              type="email"
-              margin="normal"
-            />
+            <TextField fullWidth variant="outlined" label="Email Id" type="email" margin="normal" />
           </DialogContentText>
         </DialogContent>
         <DialogActions>
