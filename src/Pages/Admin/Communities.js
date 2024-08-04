@@ -104,7 +104,7 @@ export default function Communities() {
                   <b>User:</b> {card.User}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  <b>Questions:</b> {card.Questions}
+                  <b>Questions:</b> {card.Questions.length}
                 </Typography>
               </CardContent>
               <CardActions sx={{ justifyContent: 'flex-end' }}>
