@@ -1,40 +1,33 @@
-import React, { useState, useEffect } from 'react';
-import useGet from './ServiceHelper/Api/useGet';
-import usePost from './ServiceHelper/Api/usePost';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Login from './Pages/Authentication/Login';
+import Registration from './Pages/Authentication/Registration';
+import Dashboard from './Pages/Dashboard';
+import Admin from './Pages/Admin/Admin';
+import AdminDashboard from './Pages/Admin/AdminDashboard';
+import Communities from './Pages/Admin/Communities';
+import UserList from './Pages/Admin/UserList';
+import UserDetails from './Pages/Admin/UserDetails';
+import CommunityDetails from './Pages/Admin/CommunityDetails';
 
 export default function App() {
-  const { data, loading, error } = useGet('/objects'); // replace with your endpoint
-  const [postData, setPostData] = useState(null);
-  const [triggerPost, setTriggerPost] = useState(false);
-  
-  const { data: data1, loading: loading1, error: error1 } = usePost('/objects', postData, triggerPost);
-
-  useEffect(() => {
-    if (triggerPost) {
-      setTriggerPost(false); // Reset triggerPost after post request
-    }
-  }, [data1, error1]);
-
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error.message}</p>;
-
-  const handleClick = () => {
-    setPostData({ "name": "kartik", "age": 30 });
-    setTriggerPost(true);
-  };
+  const loginRes = JSON.parse(localStorage.getItem('logindata'));
+  console.log(loginRes?.success);
 
   return (
-    <>
-      <div>
-        <h1>Data:</h1>
-        <pre>{JSON.stringify(data, null, 2)}</pre>
-      </div>
-      <div>
-        <button onClick={handleClick}>Post Data</button>
-        {loading1 && <p>Loading...</p>}
-        {error1 && <p>Error: {error1.message}</p>}
-        {data1 && <pre>{JSON.stringify(data1, null, 2)}</pre>}
-      </div>
-    </>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/registration" element={<Registration />} />
+        <Route path="*" element={<Dashboard />}>
+          <Route path="admin" element={<Admin />} />
+          <Route path="admin-dashboard" element={<AdminDashboard />} />
+          <Route path="admin-community" element={<Communities />} />
+          <Route path="users-list" element={<UserList />} />
+          <Route path="users-details" element={<UserDetails />} />
+          <Route path="community-details" element={<CommunityDetails />} />
+        </Route>
+      </Routes>
+    </Router>
   );
 }
