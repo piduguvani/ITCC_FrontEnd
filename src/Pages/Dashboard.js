@@ -1,4 +1,4 @@
-import React from 'react';
+import React ,{useContext,useEffect} from 'react';
 import { styled, useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
@@ -25,6 +25,8 @@ import Logout from '@mui/icons-material/Logout';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import Badge from '@mui/material/Badge';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { jwtDecode } from "jwt-decode";  
+import { AuthContext } from '../ServiceHelper/AuthContext';
 
 const drawerWidth = 240;
 
@@ -79,11 +81,25 @@ export default function Dashboard() {
   const openMenu = Boolean(anchorEl);
   const navigate = useNavigate();
   const location = useLocation();
+  const { token, logout } = useContext(AuthContext);
+  const [userToken, setUserToken] = React.useState({})
 
   const handleMenuClick = (event) => setAnchorEl(event.currentTarget);
   const handleMenuClose = () => setAnchorEl(null);
 
-  const logout = () => {
+  useEffect(()=>{
+    if (typeof token === 'string') {
+      try {
+        const decodedToken = jwtDecode(token);
+        setUserToken(decodedToken)
+      } catch (error) {
+        console.error('Error decoding token:', error);
+      }
+    } else {
+      console.error('Token must be a string');
+    }
+  },[token])
+  const logoutAccount = () => {
     navigate('/');
   };
 
@@ -157,7 +173,7 @@ export default function Dashboard() {
           </IconButton>
         </DrawerHeader>
         <Divider />
-        <List>
+        {userToken.userRole === 'admin' && <List style={{paddingbottom:'0px'}}>
           <ListItem disablePadding>
             <ListItemButton
               onClick={() => navigate('/admin-dashboard')}
@@ -191,7 +207,33 @@ export default function Dashboard() {
               <ListItemText primary="Community" />
             </ListItemButton>
           </ListItem>
-        </List>
+        </List>}
+        {userToken.userRole === 'user' && <List style={{paddingbottom:'0px'}}>
+          <ListItem disablePadding>
+            <ListItemButton onClick={() => navigate('/user-dashboard')}>
+              <ListItemIcon>
+                <DashboardIcon />
+              </ListItemIcon>
+              <ListItemText primary="Home" />
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding>
+            <ListItemButton onClick={() => navigate('/users')}>
+              <ListItemIcon>
+                <GroupIcon />
+              </ListItemIcon>
+              <ListItemText primary="Community" />
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding>
+            <ListItemButton onClick={() => navigate('/admin-community')}>
+              <ListItemIcon>
+                <GroupIcon />
+              </ListItemIcon>
+              <ListItemText primary="Articles" />
+            </ListItemButton>
+          </ListItem>
+        </List>} 
       </Drawer>
       <Main open={open}>
         <DrawerHeader />
@@ -234,7 +276,7 @@ export default function Dashboard() {
         <MenuItem>
           <Avatar /> Profile
         </MenuItem>
-        <MenuItem onClick={logout}>
+        <MenuItem onClick={logoutAccount}>
           <ListItemIcon>
             <Logout fontSize="small" />
           </ListItemIcon>
