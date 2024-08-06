@@ -1,67 +1,27 @@
-import React,{useState} from 'react';
+import React, { useState } from 'react';
 import {
     Box, Tabs, Tab, Typography, Avatar, Grid, IconButton, Menu, MenuItem, ListItem, ListItemText, List,
     Badge, Fab, Button, Paper, InputBase, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField
 } from '@mui/material';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { ListItemAvatar } from '@material-ui/core';
 import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/system';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import ContactSupportIcon from '@mui/icons-material/ContactSupport';
-
-
-const users = [
-    { name: 'Karthik Nistala', email: 'Karthike@gmail.com', profilePicture: '/path/to/profile-pic1.jpg' },
-    { name: 'Vani Pidudgu', email: 'Vani@gmail.com', profilePicture: '/path/to/profile-pic2.jpg' },
-    { name: 'Sambhavi Prathi', email: 'Sambhavi@gmail.com', profilePicture: '/path/to/profile-pic1.jpg' },
-    { name: 'Karthik Nistala', email: 'Karthike@gmail.com', profilePicture: '/path/to/profile-pic1.jpg' },
-    { name: 'Vani Pidudgu', email: 'Vani@gmail.com', profilePicture: '/path/to/profile-pic2.jpg' },
-    { name: 'Sambhavi Prathi', email: 'Sambhavi@gmail.com', profilePicture: '/path/to/profile-pic1.jpg' },
-    { name: 'Karthik Nistala', email: 'Karthike@gmail.com', profilePicture: '/path/to/profile-pic1.jpg' },
-    { name: 'Vani Pidudgu', email: 'Vani@gmail.com', profilePicture: '/path/to/profile-pic2.jpg' },
-];
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import CommentIcon from '@mui/icons-material/Comment';
 
 const CustomDialog = styled(Dialog)({
     '& .MuiPaper-root': {
         borderRadius: 20,
         padding: '16px',
-        // background: 'linear-gradient(to bottom, #1d50a1, #799fbf)',
-        // color: '#fff',
         minWidth: 300,
-        maxWidth: 400, // Optional: Adjust the max-width for better appearance
+        maxWidth: 400,
     },
 });
-
-const AvatarContainer = styled(Avatar)({
-    margin: '0 auto 16px auto',
-    width: 60,
-    height: 60,
-    backgroundColor: '#fff',
-    color: '#1976d2',
-});
-
 const CustomTextField = styled(TextField)({
-    '& .MuiOutlinedInput-root': {
-        '& fieldset': {
-            // borderColor: '#fff',
-        },
-        '&:hover fieldset': {
-            // borderColor: '#fff',
-        },
-        '&.Mui-focused fieldset': {
-            // borderColor: '#fff',
-        },
-    },
-    '& .MuiInputBase-input': {
-        // color: '#fff',
-    },
-    '& .MuiInputLabel-root': {
-        // color: '#fff',
-    },
 });
 
 const CustomButton = styled(Button)({
@@ -74,8 +34,13 @@ const CustomButton = styled(Button)({
 
 export default function Users() {
     const [value, setValue] = useState(0);
-    const [anchorEl, setAnchorEl] = useState(null);
     const [open, setOpen] = useState(false);
+    const [commentOpen, setCommentOpen] = useState({});
+    const [thumbOpen, setThumbOpen] = useState(0);
+    const [postTabValue, setPostTabValue] = useState(0);
+    const handlePostTabChange = (event, newValue) => {
+        setPostTabValue(newValue);
+    };
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -89,6 +54,17 @@ export default function Users() {
         setOpen(false);
     };
 
+    const onComment = (index) => {
+        setCommentOpen((prevState) => ({
+            ...prevState,
+            [index]: !prevState[index]
+        }));
+    };
+    const onThumb = () => {
+        setThumbOpen(prev => prev + 1);
+    };
+
+
     const questions = [
         { votes: 135, title: "Can Browsers read a JSX File? What is Babel?", date: "Nov 18, 2008" },
         { votes: 77, title: "How do React apps load and display the components in the browser?", date: "Sep 19, 2008" },
@@ -98,6 +74,7 @@ export default function Users() {
         { votes: 135, title: "It is used to transpile JSX syntax into regular Javascript which browsers can understand", date: "Nov 18, 2008" },
         { votes: 77, title: "React uses a virtual DOM to efficiently update and render components to the actual DOM in the browser.", date: "Sep 19, 2008" },
     ];
+
     const posts = [
         {
             votes: 135,
@@ -114,9 +91,7 @@ export default function Users() {
                 }
             ]
         },
-
     ];
-
 
     return (
         <div>
@@ -162,14 +137,14 @@ export default function Users() {
                     <Box p={3}>
                         <b>{answers.length} Answers</b>
                         <List>
-                            {answers.map((answers, index) => (
+                            {answers.map((answer, index) => (
                                 <ListItem key={index}>
                                     <ListItemAvatar>
-                                        <Badge badgeContent={answers.votes} color="primary">
+                                        <Badge badgeContent={answer.votes} color="primary">
                                             <QuestionAnswerIcon />
                                         </Badge>
                                     </ListItemAvatar>
-                                    <ListItemText primary={answers.title} secondary={answers.date} />
+                                    <ListItemText primary={answer.title} secondary={answer.date} />
                                 </ListItem>
                             ))}
                         </List>
@@ -177,42 +152,83 @@ export default function Users() {
                 )}
                 {value === 2 && (
                     <Box p={3}>
-                        <b>{posts?.length || 0} Posts</b>
-                        {Array.isArray(posts) && posts.length > 0 ? (
-                            <List>
-                                {posts.map((post, index) => (
-                                    <React.Fragment key={index}>
-                                        <ListItem alignItems="flex-start">
-                                            <ListItemAvatar>
-                                                <Badge badgeContent={post.votes} color="primary">
-                                                    <ContactSupportIcon fontSize="large" />
-                                                </Badge>
-                                            </ListItemAvatar>
-                                            <ListItemText
-                                                primary={<Typography variant="body1" fontWeight="bold">{post.ques}</Typography>}
-                                                secondary={post.date}
-                                            />
-                                        </ListItem>
-                                        {post.answers && (
-                                            <List component="div" disablePadding>
-                                                {post.answers.map((answer, idx) => (
-                                                    <ListItem key={idx} style={{ paddingLeft: 40 }}>
-                                                        <ListItemAvatar>
-                                                            <QuestionAnswerIcon />
-                                                        </ListItemAvatar>
-                                                        <ListItemText primary={answer.text} secondary={answer.date} />
-                                                    </ListItem>
-                                                ))}
-                                            </List>
-                                        )}
-                                    </React.Fragment>
-                                ))}
-                            </List>
-                        ) : (
-                            <Typography>No posts available.</Typography>
+                        <Tabs value={postTabValue} onChange={handlePostTabChange} aria-label="post tabs">
+                            <Tab label="Community Posts" />
+                            <Tab label="All Posts" />
+                        </Tabs>
+                        {postTabValue === 0 && (
+                            <Box p={3}>
+                                <b>{posts?.length || 0} Community Posts</b>
+                                {Array.isArray(posts) && posts.length > 0 ? (
+                                    <List>
+                                        {posts.map((post, index) => (
+                                            <React.Fragment key={index}>
+                                                <ListItem alignItems="flex-start">
+                                                    <ListItemAvatar>
+                                                        <Badge badgeContent={post.votes} color="primary">
+                                                            <ContactSupportIcon fontSize="large" />
+                                                        </Badge>
+                                                    </ListItemAvatar>
+                                                    <ListItemText
+                                                        primary={<Typography variant="body1" fontWeight="bold">{post.ques}</Typography>}
+                                                    />
+                                                </ListItem>
+                                                {post.answers && (
+                                                    <List component="div" disablePadding>
+                                                        {post.answers.map((answer, idx) => (
+                                                            <ListItem key={idx} style={{ paddingLeft: 40 }}>
+                                                                <ListItemAvatar>
+                                                                    <QuestionAnswerIcon />
+                                                                </ListItemAvatar>
+                                                                <ListItemText
+                                                                    primary={answer.text}
+                                                                    secondary={
+                                                                        <React.Fragment>
+                                                                            {answer.date}
+                                                                            <Box mt={1}>
+                                                                                <IconButton aria-label="like" onClick={onThumb}>
+                                                                                    <Badge badgeContent={thumbOpen} color="primary">
+                                                                                        <ThumbUpIcon />
+                                                                                    </Badge>
+                                                                                </IconButton>
+                                                                                <IconButton aria-label="comment" onClick={() => onComment(`${index}-${idx}`)}>
+                                                                                    <CommentIcon />
+                                                                                </IconButton>
+                                                                            </Box>
+                                                                            {commentOpen[`${index}-${idx}`] && (
+                                                                                <div>
+                                                                                    <TextField
+                                                                                        id="outlined-multiline-flexible"
+                                                                                        placeholder='Add a comment'
+                                                                                        multiline
+                                                                                        maxRows={4}
+                                                                                        fullWidth
+                                                                                    />
+                                                                                </div>
+                                                                            )}
+                                                                        </React.Fragment>
+                                                                    }
+                                                                />
+                                                            </ListItem>
+                                                        ))}
+                                                    </List>
+                                                )}
+                                            </React.Fragment>
+                                        ))}
+                                    </List>
+                                ) : (
+                                    <Typography>No community posts available.</Typography>
+                                )}
+                            </Box>
+                        )}
+                        {postTabValue === 1 && (
+                            <Box p={3}>
+                                {/* Implement the All Posts content similarly */}
+                                <b>All Posts</b>
+                                {/* Add the logic to display all posts here */}
+                            </Box>
                         )}
                     </Box>
-
                 )}
             </Box>
             <CustomDialog
@@ -231,9 +247,6 @@ export default function Users() {
                         <CloseIcon />
                     </IconButton>
                 </DialogActions>
-                {/* <AvatarContainer>
-                    <QuestionAnswerIcon />
-                </AvatarContainer> */}
                 <DialogTitle>Ask your Query ?</DialogTitle>
                 <DialogContent>
                     <CustomTextField
